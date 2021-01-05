@@ -52,12 +52,11 @@
 
 #include "cycfg_system.h"
 
-
 #define configUSE_PREEMPTION                    1
 
 #define configCPU_CLOCK_HZ                      SystemCoreClock
 #define configTICK_RATE_HZ                      1000u
-#define configMAX_PRIORITIES                    7
+#define configMAX_PRIORITIES                    14
 #define configMINIMAL_STACK_SIZE                128
 #define configMAX_TASK_NAME_LEN                 16
 #define configUSE_16_BIT_TICKS                  0
@@ -177,6 +176,19 @@ standard names - or at least those used in the unmodified vector table. */
 #define NO_HEAP_ALLOCATION                          (0)
 
 #define configHEAP_ALLOCATION_SCHEME                (HEAP_ALLOCATION_TYPE3)
+#define configUSE_TICKLESS_IDLE 0
+#if 0
+#if (CY_CFG_PWR_SYS_IDLE_MODE == CY_CFG_PWR_MODE_SLEEP) || (CY_CFG_PWR_SYS_IDLE_MODE == CY_CFG_PWR_MODE_DEEPSLEEP)
+extern void vApplicationSleep( uint32_t xExpectedIdleTime );
+#define portSUPPRESS_TICKS_AND_SLEEP( xIdleTime ) vApplicationSleep( xIdleTime )
+#define configUSE_TICKLESS_IDLE  2
+#endif
+
+/* Deep Sleep Latency Configuration */
+#if CY_CFG_PWR_DEEPSLEEP_LATENCY > 0
+#define configEXPECTED_IDLE_TIME_BEFORE_SLEEP   CY_CFG_PWR_DEEPSLEEP_LATENCY
+#endif
+#endif
 
 #endif /* FREERTOS_CONFIG_H */
 

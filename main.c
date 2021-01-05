@@ -1,5 +1,5 @@
 /*
- * Copyright 2020, Cypress Semiconductor Corporation or a subsidiary of
+ * Copyright 2021, Cypress Semiconductor Corporation or a subsidiary of
  * Cypress Semiconductor Corporation. All Rights Reserved.
  *
  * This software, including source code, documentation and related
@@ -35,7 +35,6 @@
  * This application shows a basic test of how to add a command
   *
  */
-//#define ENABLE_BT_COMMAND_TEST 1
 #include "cyhal.h"
 #include "cybsp.h"
 #include <cy_retarget_io.h>
@@ -45,24 +44,38 @@
 #include <stdio.h>
 #include <lwip/tcpip.h>
 #include <lwip/api.h>
-
 #include "command_console.h"
 #include "iperf_utility.h"
-#include "cy_lwip.h"
-
-#ifdef ENABLE_BT_COMMAND_TEST
+#include "wifi_utility.h"
+#include "cy_wcm.h"
 #include "bt_utility.h"
 #include "bt_cfg.h"
-#endif
+
+
+/*
+ * CPU CLOCK FREQUENCY
+ */
+#define CPU_CLOCK_FREQUENCY 144000000
+
+/* Peripheral clock dividier */
+#define CPU_PERI_CLOCK_DIV (2)
+
+#define CHECK_APP_RETURN(expr)  { \
+        cy_rslt_t rslt = (expr); \
+        if (rslt != CY_RSLT_SUCCESS) \
+        { \
+           return rslt; \
+        } \
+}
+
+cy_rslt_t set_cpu_clock ( uint32_t freq );
 
 /* This enables RTOS aware debugging */
 volatile int uxTopUsedPriority;
 
-/* The primary WIFI driver  */
-static whd_interface_t iface ;
-
-/* This enables RTOS aware debugging */
-volatile int uxTopUsedPriority ;
+/* wcm parameters */
+static cy_wcm_config_t wcm_config;
+static cy_wcm_connect_params_t conn_params;
 
 cy_rslt_t ConnectWifi();
 
@@ -75,16 +88,22 @@ const char* console_delimiter_string = " ";
 static char command_buffer[CONSOLE_COMMAND_MAX_LENGTH];
 static char command_history_buffer[CONSOLE_COMMAND_MAX_LENGTH * CONSOLE_COMMAND_HISTORY_LENGTH];
 
-#define WIFI_SSID   ""
-#define WIFI_KEY    ""
-#define MAX_WIFI_RETRY_COUNT 15
+#define WIFI_SSID                        ""
+#define WIFI_KEY                         ""
+#define CMD_CONSOLE_MAX_WIFI_RETRY_COUNT 15
+#define IP_STR_LEN                       16
 
-#define CY_RSLT_ERROR ( -1 )
+#define CY_RSLT_ERROR                    ( -1 )
 
 cy_rslt_t command_console_add_command();
 
-static void donothing(void *arg)
+static void get_ip_string(char* buffer, uint32_t ip)
 {
+    sprintf(buffer, "%lu.%lu.%lu.%lu",
+            (ip      ) & 0xFF,
+            (ip >>  8) & 0xFF,
+            (ip >> 16) & 0xFF,
+            (ip >> 24) & 0xFF);
 }
 
 cy_rslt_t ConnectWifi()
@@ -94,63 +113,43 @@ cy_rslt_t ConnectWifi()
     const char *ssid = WIFI_SSID ;
     const char *key = WIFI_KEY ;
     int retry_count = 0;
-    cy_lwip_nw_interface_t nw_interface;
+    cy_wcm_ip_address_t ip_addr;
+    char ipstr[IP_STR_LEN];
 
-    whd_ssid_t ssiddata ;
-    tcpip_init(donothing, NULL) ;
-    printf("LWiP TCP/IP stack initialized\n") ;
-    /*
-     *   Initialize wifi driver
-     */
-    cybsp_wifi_init_primary(&iface) ;
-    printf("WIFI driver initialized \n") ;
+    memset(&conn_params, 0, sizeof(cy_wcm_connect_params_t));
 
     while (1)
     {
-         /*
-         * Join to WIFI AP
-         */
-         ssiddata.length = strlen(ssid) ;
-         memcpy(ssiddata.value, ssid, ssiddata.length) ;
-         res = whd_wifi_join(iface, &ssiddata, WHD_SECURITY_WPA2_AES_PSK, (const uint8_t *)key, strlen(key)) ;
-         vTaskDelay(500);
+        /*
+        * Join to WIFI AP
+        */
+        memcpy(&conn_params.ap_credentials.SSID, ssid, strlen(ssid) + 1);
+        memcpy(&conn_params.ap_credentials.password, key, strlen(key) + 1);
+        conn_params.ap_credentials.security = CY_WCM_SECURITY_WPA2_AES_PSK;
 
-         if (res != CY_RSLT_SUCCESS)
-         {
-              retry_count++;
-              if (retry_count >= MAX_WIFI_RETRY_COUNT)
-              {
-                  printf("Exceeded max WiFi connection attempts\n");
-                  return CY_RSLT_ERROR;
-              }
-              printf("Connection to WiFi network failed. Retrying...\n");
-              continue;
-         }
-         else
-         {
-              printf("Successfully joined wifi network '%s , result = %ld'\n", ssid, res) ;
-              break;
-         }
-    }
+        res = cy_wcm_connect_ap(&conn_params, &ip_addr);
+        vTaskDelay(500);
 
-    nw_interface.role = CY_LWIP_STA_NW_INTERFACE;
-    nw_interface.whd_iface = iface;
-
-    cy_lwip_add_interface(&nw_interface, NULL);
-
-    cy_lwip_network_up(&nw_interface);
-
-    struct netif *net = cy_lwip_get_interface(CY_LWIP_STA_NW_INTERFACE);
-
-    while (true)
-    {
-        if (net->ip_addr.u_addr.ip4.addr != 0)
+        if(res != CY_RSLT_SUCCESS)
         {
-             printf("IP Address %s assigned\n", ip4addr_ntoa(&net->ip_addr.u_addr.ip4)) ;
-             break ;
+            retry_count++;
+            if (retry_count >= CMD_CONSOLE_MAX_WIFI_RETRY_COUNT)
+            {
+                printf("Exceeded max WiFi connection attempts\n");
+                return CY_RSLT_ERROR;
+            }
+            printf("Connection to WiFi network failed. Retrying...\n");
+            continue;
         }
-        vTaskDelay(100) ;
+        else
+        {
+            printf("Successfully joined wifi network '%s , result = %ld'\n", ssid, res);
+			get_ip_string(ipstr, ip_addr.ip.v4);
+            printf("IP Address %s assigned\n", ipstr);
+            break;
+        }
     }
+
     return CY_RSLT_SUCCESS;
 }
 
@@ -167,6 +166,7 @@ cy_rslt_t command_console_add_command(void) {
     console_cfg.history_buffer_ptr = command_history_buffer;
     console_cfg.delimiter_string   = console_delimiter_string;
     console_cfg.params_num         = CONSOLE_COMMAND_MAX_PARAMS;
+    console_cfg.thread_priority    = CY_RTOS_PRIORITY_NORMAL;
     console_cfg.delimiter_string   = " ";
 
     /* Initialize command console library */
@@ -177,13 +177,19 @@ cy_rslt_t command_console_add_command(void) {
         goto error;
     }
 
+    /* Initialize Wi-Fi utility and add Wi-Fi commands */
+    result = wifi_utility_init();
+    if ( result != CY_RSLT_SUCCESS )
+    {
+        printf ("Error in initializing command console library : %ld \n", result);
+        goto error;
+    }
+
     /* Initialize IPERF utility and add IPERF commands */
-    iperf_utility_init(&iface);
+    iperf_utility_init(&wcm_config.interface);
 
     /* Initialize Bluetooth utility and add BT commands */
-#ifdef ENABLE_BT_COMMAND_TEST
     bt_utility_init();
-#endif
 
     return CY_RSLT_SUCCESS;
 
@@ -194,6 +200,24 @@ error:
 
 static void console_task(void *arg)
 {
+    cy_rslt_t res;
+    
+    printf(" CY_SRAM_SIZE:%ld\n", CY_SRAM_SIZE);
+    printf(" Heap size:%d\n", configTOTAL_HEAP_SIZE);
+    printf(" SystemCoreClock:%ld\n", SystemCoreClock);
+    printf("==============================================\n");
+    
+
+    /* Initialize wcm */
+    wcm_config.interface = CY_WCM_INTERFACE_TYPE_STA;
+    res = cy_wcm_init(&wcm_config);
+    if(res != CY_RSLT_SUCCESS)
+    {
+        printf("cy_wcm_init failed with error: %lu\n", res);
+        return;
+    }
+    printf("WCM Initialized\n");
+
     /* Connect to an AP for which credentials are specified */
     ConnectWifi();
 
@@ -218,11 +242,15 @@ int main(void)
     if( result != CY_RSLT_SUCCESS)
     {
         printf("cybsp_init failed %ld\n", result);
-        return -1;
+        return CY_RSLT_ERROR;
     }
     CY_ASSERT(result == CY_RSLT_SUCCESS) ;
     /* Enable global interrupts */
     __enable_irq();
+    
+    /* set CPU clock to CPU_CLOCK_FREQUENCY */
+    result = set_cpu_clock(CPU_CLOCK_FREQUENCY);
+    CY_ASSERT(result == CY_RSLT_SUCCESS) ;
 
     cy_retarget_io_init(CYBSP_DEBUG_UART_TX, CYBSP_DEBUG_UART_RX, CY_RETARGET_IO_BAUDRATE);
 
@@ -234,3 +262,47 @@ int main(void)
 
     return 0;
 }
+
+cy_rslt_t set_cpu_clock ( uint32_t freq )
+{
+    cy_rslt_t ret = CY_RSLT_SUCCESS;
+    uint32_t old_freq;
+    cyhal_clock_t clock_pll, clock_hf0 , clock_peri;
+
+    /* Get the HF0 resource */
+    CHECK_APP_RETURN(cyhal_clock_get(&clock_hf0 , &CYHAL_CLOCK_HF[0] ));
+
+    old_freq = cyhal_clock_get_frequency(&clock_hf0);
+    if ( freq != old_freq )
+    {
+        /* Get the PLL and PERI resource */
+        CHECK_APP_RETURN(cyhal_clock_get(&clock_pll,  &CYHAL_CLOCK_PLL[0]));
+        CHECK_APP_RETURN(cyhal_clock_get(&clock_peri, &CYHAL_CLOCK_PERI));
+
+        /* Initialize, take ownership of, the PLL instance */
+        CHECK_APP_RETURN(cyhal_clock_init(&clock_pll));
+
+        /* Set CPU clock to freq */
+        CHECK_APP_RETURN(cyhal_clock_set_frequency(&clock_pll, freq, NULL));
+
+        /* If the PLL is not already enabled, enable it */
+        if (!cyhal_clock_is_enabled(&clock_pll))
+        {
+            CHECK_APP_RETURN(cyhal_clock_set_enabled(&clock_pll, true, true));
+        }
+
+        /* Initialize, take ownership of, the PERI instance */
+        CHECK_APP_RETURN(cyhal_clock_init(&clock_peri));
+
+        /* Initialize, take ownership of, the HF0 instance */
+        CHECK_APP_RETURN(cyhal_clock_init(&clock_hf0));
+
+        /* Set peri clock divider */
+        CHECK_APP_RETURN(cyhal_clock_set_divider(&clock_peri, CPU_PERI_CLOCK_DIV));
+
+        /* set HF0 Clock source to PLL */
+        CHECK_APP_RETURN(cyhal_clock_set_source(&clock_hf0, &clock_pll));
+    }
+    return ret;
+}
+

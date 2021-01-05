@@ -66,8 +66,7 @@ VERBOSE=0
 # ... then code in directories named COMPONENT_foo and COMPONENT_bar will be
 # added to the build
 #
-COMPONENTS=FREERTOS 4343W CY8CPROTO_062_4343W PSOC6HAL MBEDTLS LWIP SECURE_SOCKETS WICED_BLE
-
+COMPONENTS=FREERTOS PSOC6HAL MBEDTLS LWIP SECURE_SOCKETS WICED_BLE WCM
 
 # Like COMPONENTS, but disable optional code that was enabled by default.
 DISABLE_COMPONENTS=
@@ -85,7 +84,7 @@ INCLUDES=
 MBEDTLSFLAGS = MBEDTLS_USER_CONFIG_FILE='"configs/mbedtls_user_config.h"'
 
 # Add additional defines to the build process (without a leading -D).
-DEFINES=$(MBEDTLSFLAGS) CYBSP_WIFI_CAPABLE ENABLE_UNITTESTS HAVE_SNPRINTF ANYCLOUD
+DEFINES=$(MBEDTLSFLAGS) CYBSP_WIFI_CAPABLE ENABLE_UNITTESTS HAVE_SNPRINTF CY_RTOS_AWARE
 
 
 # Select softfp or hardfp floating point. Default is softfp.
@@ -139,9 +138,18 @@ endif
 # This controls where automatic source code discovery looks for code.
 CY_APP_PATH=
 
-# Relative path to the "base" library. It provides the core makefile build
-# infrastructure.
-CY_BASELIB_PATH=libs/psoc6make
+# Relative path to the shared repo location.
+#
+# All .mtb files have the format, <URI><COMMIT><LOCATION>. If the <LOCATION> field
+# begins with $$ASSET_REPO$$, then the repo is deposited in the path specified by
+# the CY_GETLIBS_SHARED_PATH variable. The default location is one directory level
+# above the current app directory.
+# This is used with CY_GETLIBS_SHARED_NAME variable, which specifies the directory name.
+CY_GETLIBS_SHARED_PATH=../
+
+# Directory name of the shared repo location.
+#
+CY_GETLIBS_SHARED_NAME=mtb_shared
 
 # Absolute path to the compiler's "bin" directory.
 #
