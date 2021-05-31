@@ -7,7 +7,7 @@
 #
 ################################################################################
 # \copyright
-# Copyright 2018-2019 Cypress Semiconductor Corporation
+# Copyright 2021 Cypress Semiconductor Corporation (an Infineon company)
 # SPDX-License-Identifier: Apache-2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -35,7 +35,7 @@ APPNAME=mtb-anycloud-wifi-bluetooth-tester
 
 # Name of toolchain to use. Options include:
 #
-# GCC_ARM -- GCC 7.2.1, provided with ModusToolbox IDE
+# GCC_ARM -- GCC 9.3.1, provided with ModusToolbox IDE
 # ARM     -- ARM Compiler (must be installed separately)
 # IAR     -- IAR Compiler (must be installed separately)
 #
@@ -129,6 +129,14 @@ else
 CY_IGNORE+=./libs/FreeRTOS-Kernel/FreeRTOS/Source/portable/IAR
 endif
 
+ifeq ($(TOOLCHAIN), ARM)
+CY_COMPILER_ARM_DIR="C:/Program Files/ARMCompiler6.14"
+endif
+
+ifeq ($(TOOLCHAIN), ARM)
+LDFLAGS+=--diag_suppress=L6314W
+endif
+
 ################################################################################
 # Paths
 ################################################################################
@@ -156,7 +164,6 @@ CY_GETLIBS_SHARED_NAME=mtb_shared
 # The default depends on the selected TOOLCHAIN (GCC_ARM uses the ModusToolbox
 # IDE provided compiler by default).
 CY_COMPILER_PATH=
-#CY_COMPILER_PATH="C:/Program Files (x86)/IAR Systems/Embedded Workbench 8.3/arm"
 
 
 # Locate ModusToolbox IDE helper tools folders in default installation

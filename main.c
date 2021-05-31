@@ -1,10 +1,10 @@
 /*
- * Copyright 2021, Cypress Semiconductor Corporation or a subsidiary of
- * Cypress Semiconductor Corporation. All Rights Reserved.
+ * Copyright 2021, Cypress Semiconductor Corporation (an Infineon company) or
+ * an affiliate of Cypress Semiconductor Corporation.  All rights reserved.
  *
  * This software, including source code, documentation and related
- * materials ("Software"), is owned by Cypress Semiconductor Corporation
- * or one of its subsidiaries ("Cypress") and is protected by and subject to
+ * materials ("Software") is owned by Cypress Semiconductor Corporation
+ * or one of its affiliates ("Cypress") and is protected by and subject to
  * worldwide patent protection (United States and foreign),
  * United States copyright laws and international treaty provisions.
  * Therefore, you may use this Software only as provided in the license
@@ -13,7 +13,7 @@
  * If no EULA applies, Cypress hereby grants you a personal, non-exclusive,
  * non-transferable license to copy, modify, and compile the Software
  * source code solely for use in connection with Cypress's
- * integrated circuit products. Any reproduction, modification, translation,
+ * integrated circuit products.  Any reproduction, modification, translation,
  * compilation, or representation of this Software except as specified
  * above is prohibited without the express written permission of Cypress.
  *
@@ -90,6 +90,7 @@ static char command_history_buffer[CONSOLE_COMMAND_MAX_LENGTH * CONSOLE_COMMAND_
 
 #define WIFI_SSID                        ""
 #define WIFI_KEY                         ""
+#define WIFI_BAND                        CY_WCM_WIFI_BAND_ANY
 #define CMD_CONSOLE_MAX_WIFI_RETRY_COUNT 15
 #define IP_STR_LEN                       16
 
@@ -100,10 +101,10 @@ cy_rslt_t command_console_add_command();
 static void get_ip_string(char* buffer, uint32_t ip)
 {
     sprintf(buffer, "%lu.%lu.%lu.%lu",
-            (ip      ) & 0xFF,
-            (ip >>  8) & 0xFF,
-            (ip >> 16) & 0xFF,
-            (ip >> 24) & 0xFF);
+            (unsigned long)(ip      ) & 0xFF,
+            (unsigned long)(ip >>  8) & 0xFF,
+            (unsigned long)(ip >> 16) & 0xFF,
+            (unsigned long)(ip >> 24) & 0xFF);
 }
 
 cy_rslt_t ConnectWifi()
@@ -112,6 +113,7 @@ cy_rslt_t ConnectWifi()
 
     const char *ssid = WIFI_SSID ;
     const char *key = WIFI_KEY ;
+    cy_wcm_wifi_band_t band = WIFI_BAND;
     int retry_count = 0;
     cy_wcm_ip_address_t ip_addr;
     char ipstr[IP_STR_LEN];
@@ -126,6 +128,7 @@ cy_rslt_t ConnectWifi()
         memcpy(&conn_params.ap_credentials.SSID, ssid, strlen(ssid) + 1);
         memcpy(&conn_params.ap_credentials.password, key, strlen(key) + 1);
         conn_params.ap_credentials.security = CY_WCM_SECURITY_WPA2_AES_PSK;
+        conn_params.band = band;
 
         res = cy_wcm_connect_ap(&conn_params, &ip_addr);
         vTaskDelay(500);
@@ -143,8 +146,8 @@ cy_rslt_t ConnectWifi()
         }
         else
         {
-            printf("Successfully joined wifi network '%s , result = %ld'\n", ssid, res);
-			get_ip_string(ipstr, ip_addr.ip.v4);
+            printf("Successfully joined wifi network '%s , result = %ld'\n", ssid, (long)res);
+            get_ip_string(ipstr, ip_addr.ip.v4);
             printf("IP Address %s assigned\n", ipstr);
             break;
         }
@@ -173,7 +176,7 @@ cy_rslt_t command_console_add_command(void) {
     result = cy_command_console_init(&console_cfg);
     if ( result != CY_RSLT_SUCCESS )
     {
-        printf ("Error in initializing command console library : %ld \n", result);
+        printf ("Error in initializing command console library : %ld \n", (long)result);
         goto error;
     }
 
@@ -181,7 +184,7 @@ cy_rslt_t command_console_add_command(void) {
     result = wifi_utility_init();
     if ( result != CY_RSLT_SUCCESS )
     {
-        printf ("Error in initializing command console library : %ld \n", result);
+        printf ("Error in initializing command console library : %ld \n", (long)result);
         goto error;
     }
 
@@ -202,9 +205,9 @@ static void console_task(void *arg)
 {
     cy_rslt_t res;
     
-    printf(" CY_SRAM_SIZE:%ld\n", CY_SRAM_SIZE);
+    printf(" CY_SRAM_SIZE:%ld\n", (long)CY_SRAM_SIZE);
     printf(" Heap size:%d\n", configTOTAL_HEAP_SIZE);
-    printf(" SystemCoreClock:%ld\n", SystemCoreClock);
+    printf(" SystemCoreClock:%ld\n", (long)SystemCoreClock);
     printf("==============================================\n");
     
 
@@ -213,7 +216,7 @@ static void console_task(void *arg)
     res = cy_wcm_init(&wcm_config);
     if(res != CY_RSLT_SUCCESS)
     {
-        printf("cy_wcm_init failed with error: %lu\n", res);
+        printf("cy_wcm_init failed with error: %ld\n", (long)res);
         return;
     }
     printf("WCM Initialized\n");
@@ -241,7 +244,7 @@ int main(void)
     result = cybsp_init() ;
     if( result != CY_RSLT_SUCCESS)
     {
-        printf("cybsp_init failed %ld\n", result);
+        printf("cybsp_init failed %ld\n", (long)result);
         return CY_RSLT_ERROR;
     }
     CY_ASSERT(result == CY_RSLT_SUCCESS) ;
