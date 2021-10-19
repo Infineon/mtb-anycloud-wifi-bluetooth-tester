@@ -26,6 +26,7 @@ See the command console library [Readme.md](https://github.com/cypresssemiconduc
 
 - [PSoC&trade; 62S2 Wi-Fi Bluetooth® pioneer kit (CY8CKIT-062S2-43012)](https://www.cypress.com/CY8CKIT-062S2-43012)
 
+- [PSoC&trade; 62S2 evaluation kit (CY8CEVAL-062S2-LAI-4373M2)](https://www.cypress.com/documentation/development-kitsboards/psoc-62s2-evaluation-kit-cy8ceval-062s2)
 
 ## Hardware setup
 
@@ -44,7 +45,7 @@ This example uses the board's default configuration. See the kit user guide to e
 
 - Setting up the LE CoC application on the [CYW920719B2Q40EVB-01](%) peer device
 
-  - On the ModusToolbox project creator, select the device CYW920719B2Q40EVB-01 and create a LE Connection Oriented Channel application
+  - On the ModusToolbox&trade; project creator, select the device CYW920719B2Q40EVB-01 and create a LE Connection Oriented Channel application
 
   - Build the [le_coc](https://github.com/cypresssemiconductorco/mtb-examples-CYW920719B2Q40EVB-01-btsdk-ble/tree/master/ble/le_coc) application to run LE connection-oriented channel (CoC) on the peer device. This is part of the ModusToolbox&trade; BTSDK.
 
@@ -58,7 +59,7 @@ Create the project and open it using one of the following:
 
 <details><summary><b>In Eclipse IDE for ModusToolbox&trade;</b></summary>
 
-1. Click the **New Application** link in the **Quick Panel** (or use **File** > **New** > **ModusToolbox Application**). This launches the [Project Creator](http://www.cypress.com/ModusToolboxProjectCreator) tool.
+1. Click the **New Application** link in the **Quick Panel** (or use **File** > **New** > **ModusToolbox&trade; Application**). This launches the [Project Creator](http://www.cypress.com/ModusToolboxProjectCreator) tool.
 
 2. Pick a kit supported by the code example from the list shown in the **Project Creator - Choose Board Support Package (BSP)** dialog.
 
@@ -222,7 +223,7 @@ The main function initializes wifi-connection-manager and connects to an AP whos
 
 - [Wi-Fi connection manager library](http://github.com/cypresssemiconductorco/wifi-connection-manager)
 
-- [ Bluetooth® FreeRTOS library](http://github.com/cypresssemiconductorco/bluetooth-freertos)
+- [Bluetooth® FreeRTOS library](http://github.com/cypresssemiconductorco/bluetooth-freertos)
 
 Cypress provides a wealth of data at www.cypress.com to help you select the right device, and quickly and effectively integrate it into your design.
 
@@ -237,13 +238,8 @@ Document title: AnyCloud Tester - Wi-Fi  Bluetooth® Console
 | 1.0.0   | This is the first version of the application. |
 | 1.1.0   | Updated FreeRtosConfig.h to get better TCP and UDP throughput numbers <br> Updated the app to use the latest command console library which supports wifi diagnostic commands |
 | 1.2.0   | Updated the FreeRTOS configuration to FreeRTOS 10.3 <br> Updated the app to use bluetooth-freertos library version 3.x |
+| 1.2.1   | Minor documentation updates. |
 ------
-
-All other trademarks or registered trademarks referenced herein are the property of their respective owners.
-
-![banner](images/ifx-cy-banner.png)
-
------------------------------------------------------
 
 © Cypress Semiconductor Corporation, 2020-2021. This document is the property of Cypress Semiconductor Corporation, an Infineon Technologies company, and its affiliates ("Cypress").  This document, including any software or firmware included or referenced in this document ("Software"), is owned by Cypress under the intellectual property laws and treaties of the United States and other countries worldwide.  Cypress reserves all rights under such laws and treaties and does not, except as specifically stated in this paragraph, grant any license under its patents, copyrights, trademarks, or other intellectual property rights.  If the Software is not accompanied by a license agreement and you do not otherwise have a written agreement with Cypress governing the use of the Software, then Cypress hereby grants you a personal, non-exclusive, nontransferable license (without the right to sublicense) (1) under its copyright rights in the Software (a) for Software provided in source code form, to modify and reproduce the Software solely for use with Cypress hardware products, only internally within your organization, and (b) to distribute the Software in binary code form externally to end users (either directly or indirectly through resellers and distributors), solely for use on Cypress hardware product units, and (2) under those claims of Cypress’s patents that are infringed by the Software (as provided by Cypress, unmodified) to make, use, distribute, and import the Software solely for use with Cypress hardware products.  Any other use, reproduction, modification, translation, or compilation of the Software is prohibited.
 <br>

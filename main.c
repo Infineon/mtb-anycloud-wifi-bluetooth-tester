@@ -272,19 +272,31 @@ cy_rslt_t set_cpu_clock ( uint32_t freq )
     uint32_t old_freq;
     cyhal_clock_t clock_pll, clock_hf0 , clock_peri;
 
+#if (CYHAL_API_VERSION >= 2)
+    /* Support for HAL latest-v2.x */
+    /* Take ownership of HF0 resource */
+    CHECK_APP_RETURN(cyhal_clock_reserve(&clock_hf0, &CYHAL_CLOCK_HF[0]));
+#else
+    /* Support for HAL latest-v1.x */
     /* Get the HF0 resource */
     CHECK_APP_RETURN(cyhal_clock_get(&clock_hf0 , &CYHAL_CLOCK_HF[0] ));
+#endif
 
     old_freq = cyhal_clock_get_frequency(&clock_hf0);
     if ( freq != old_freq )
     {
+#if (CYHAL_API_VERSION >= 2)
+        /* Take ownership of PLL and PERI resource */
+        CHECK_APP_RETURN(cyhal_clock_reserve(&clock_pll , &CYHAL_CLOCK_PLL[0]));
+        CHECK_APP_RETURN(cyhal_clock_reserve(&clock_peri, &CYHAL_CLOCK_PERI));
+#else
         /* Get the PLL and PERI resource */
         CHECK_APP_RETURN(cyhal_clock_get(&clock_pll,  &CYHAL_CLOCK_PLL[0]));
         CHECK_APP_RETURN(cyhal_clock_get(&clock_peri, &CYHAL_CLOCK_PERI));
 
         /* Initialize, take ownership of, the PLL instance */
         CHECK_APP_RETURN(cyhal_clock_init(&clock_pll));
-
+#endif
         /* Set CPU clock to freq */
         CHECK_APP_RETURN(cyhal_clock_set_frequency(&clock_pll, freq, NULL));
 
@@ -294,18 +306,24 @@ cy_rslt_t set_cpu_clock ( uint32_t freq )
             CHECK_APP_RETURN(cyhal_clock_set_enabled(&clock_pll, true, true));
         }
 
+#if (CYHAL_API_VERSION < 2)
+        /* Support only for mtb-hal-cat1 latest-v1.x */
         /* Initialize, take ownership of, the PERI instance */
         CHECK_APP_RETURN(cyhal_clock_init(&clock_peri));
 
         /* Initialize, take ownership of, the HF0 instance */
         CHECK_APP_RETURN(cyhal_clock_init(&clock_hf0));
-
+#endif
         /* Set peri clock divider */
         CHECK_APP_RETURN(cyhal_clock_set_divider(&clock_peri, CPU_PERI_CLOCK_DIV));
 
         /* set HF0 Clock source to PLL */
         CHECK_APP_RETURN(cyhal_clock_set_source(&clock_hf0, &clock_pll));
+
+        cyhal_clock_free(&clock_pll);
+        cyhal_clock_free(&clock_peri);
     }
+    cyhal_clock_free(&clock_hf0);
     return ret;
 }
 
