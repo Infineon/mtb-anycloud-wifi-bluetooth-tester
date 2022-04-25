@@ -16,7 +16,7 @@ See the command console library [Readme.md](https://github.com/cypresssemiconduc
 
 ## Supported toolchains (make variable 'TOOLCHAIN')
 
-- GNU Arm® embedded compiler v9.3.1 (`GCC_ARM`) - Default value of `TOOLCHAIN`
+- GNU Arm® embedded compiler v10.3.1 (`GCC_ARM`) - Default value of `TOOLCHAIN`
 - Arm compiler v6.14 (`ARM`)
 - IAR C/C++ compiler v8.32 (`IAR`)
 
@@ -29,6 +29,10 @@ See the command console library [Readme.md](https://github.com/cypresssemiconduc
 - [PSoC&trade; 62S2 evaluation kit (CY8CEVAL-062S2-LAI-4373M2)](https://www.cypress.com/documentation/development-kitsboards/psoc-62s2-evaluation-kit-cy8ceval-062s2)
 
 - [PSoC&trade; 62S2 evaluation kit (CY8CEVAL-062S2-MUR-43439M2)](https://www.cypress.com/documentation/development-kitsboards/psoc-62s2-evaluation-kit-cy8ceval-062s2)
+
+- [CYW943907AEVAL1F evaluation kit (CYW943907AEVAL1F)](https://www.infineon.com/cms/en/product/evaluation-boards/cyw943907aeval1f)
+
+- [CYW954907AEVAL1F evaluation kit (CYW954907AEVAL1F)](https://www.infineon.com/cms/en/product/evaluation-boards/cyw954907aeval1f)
 
 ## Hardware setup
 
@@ -156,7 +160,11 @@ Various CLI tools include a `-h` option that prints help information to the term
       ```
 </details>
 
-   **Note:** Before building the application, ensure that the *deps* folder contains the BSP file (*TARGET_xxx.mtb*) corresponding to the TARGET. Execute the `make getlibs` command to fetch the BSP contents before building the application.
+   **Note:** 
+   
+   - Before building the application, ensure that the *deps* folder contains the BSP file (*TARGET_xxx.mtb*) corresponding to the TARGET. Execute the `make getlibs` command to fetch the BSP contents before building the application.
+
+   - For CYW943907AEVAL1F and CYW954907AEVAL1F kits, use `latest-v0.X` tag.
 
    After programming, the application starts automatically. Observe the messages on the UART terminal, and wait for the device to make the required connections.
 
@@ -173,6 +181,7 @@ Various CLI tools include a `-h` option that prints help information to the term
 
    - See [Running  Bluetooth® LE commands against a remote peer device](http://github.com/cypresssemiconductorco/command-console#ble-commands).
 
+**Note:** CYW943907AEVAL1F and CYW954907AEVAL1F kits do not support Bluetooth commands.
 
 ## Debugging
 
@@ -242,6 +251,7 @@ Document title: AnyCloud Tester - Wi-Fi  Bluetooth® Console
 | 1.2.0   | Updated the FreeRTOS configuration to FreeRTOS 10.3 <br> Updated the app to use bluetooth-freertos library version 3.x |
 | 1.2.1   | Minor documentation updates. |
 | 1.3.0   | Added support for CY8CEVAL-062S2-MUR-43439M2 kit. |
+| 1.4.0   | Added support for CYW943907AEVAL1F and CYW954907AEVAL1F kits. |
 ------
 
 © Cypress Semiconductor Corporation, 2020-2021. This document is the property of Cypress Semiconductor Corporation, an Infineon Technologies company, and its affiliates ("Cypress").  This document, including any software or firmware included or referenced in this document ("Software"), is owned by Cypress under the intellectual property laws and treaties of the United States and other countries worldwide.  Cypress reserves all rights under such laws and treaties and does not, except as specifically stated in this paragraph, grant any license under its patents, copyrights, trademarks, or other intellectual property rights.  If the Software is not accompanied by a license agreement and you do not otherwise have a written agreement with Cypress governing the use of the Software, then Cypress hereby grants you a personal, non-exclusive, nontransferable license (without the right to sublicense) (1) under its copyright rights in the Software (a) for Software provided in source code form, to modify and reproduce the Software solely for use with Cypress hardware products, only internally within your organization, and (b) to distribute the Software in binary code form externally to end users (either directly or indirectly through resellers and distributors), solely for use on Cypress hardware product units, and (2) under those claims of Cypress’s patents that are infringed by the Software (as provided by Cypress, unmodified) to make, use, distribute, and import the Software solely for use with Cypress hardware products.  Any other use, reproduction, modification, translation, or compilation of the Software is prohibited.

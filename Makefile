@@ -69,8 +69,10 @@ VERBOSE=0
 COMPONENTS=FREERTOS PSOC6HAL MBEDTLS LWIP SECURE_SOCKETS WICED_BLE WCM
 
 # Like COMPONENTS, but disable optional code that was enabled by default.
-DISABLE_COMPONENTS=
 
+ifeq ($(TARGET),$(filter $(TARGET),CYW943907AEVAL1F CYW954907AEVAL1F))
+DISABLE_COMPONENTS=WICED_BLE
+endif
 # By default the build system automatically looks in the Makefile's directory
 # tree for source code and builds it. The SOURCES variable can be used to
 # manually add source code to the build process from a location not searched
@@ -80,6 +82,12 @@ SOURCES=
 # Like SOURCES, but for include directories. Value should be paths to
 # directories (without a leading -I).
 INCLUDES=
+
+ifeq ($(TARGET),$(filter $(TARGET),CYW943907AEVAL1F CYW954907AEVAL1F))
+CY_IGNORE+=../mtb_shared/btstack
+CY_IGNORE+=../mtb_shared/bluetooth-freertos
+CY_IGNORE+=../mtb_shared/capsense
+endif
 
 MBEDTLSFLAGS = MBEDTLS_USER_CONFIG_FILE='"configs/mbedtls_user_config.h"'
 
