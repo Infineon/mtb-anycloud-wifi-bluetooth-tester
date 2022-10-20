@@ -28,10 +28,19 @@
 # Basic Configuration
 ################################################################################
 
+#Type of MTB Makefile Options include:
+#
+#COMBINED    -- Top Level Makefile usually for single standalone application
+#APPLICATION -- Top Level Makefile usually for multi project application
+#PROJECT     -- Project Makefile under Application
+#
+MTB_TYPE=COMBINED
+
 # Target board/hardware
-TARGET=CY8CPROTO-062-4343W
+TARGET=APP_CY8CPROTO-062-4343W
+
 # Name of application (used to derive name of final linked file).
-APPNAME=mtb-anycloud-wifi-bluetooth-tester
+APPNAME=mtb-wifi-bluetooth-tester
 
 # Name of toolchain to use. Options include:
 #
@@ -135,10 +144,6 @@ ifeq ($(TOOLCHAIN),IAR)
 CY_IGNORE+=./libs/FreeRTOS-Kernel/FreeRTOS/Source/portable/GCC
 else
 CY_IGNORE+=./libs/FreeRTOS-Kernel/FreeRTOS/Source/portable/IAR
-endif
-
-ifeq ($(TOOLCHAIN), ARM)
-CY_COMPILER_ARM_DIR="C:/Program Files/ARMCompiler6.14"
 endif
 
 ifeq ($(TOOLCHAIN), ARM)
