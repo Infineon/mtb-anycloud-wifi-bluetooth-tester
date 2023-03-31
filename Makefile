@@ -79,7 +79,7 @@ COMPONENTS=FREERTOS PSOC6HAL MBEDTLS LWIP SECURE_SOCKETS WICED_BLE WCM
 
 # Like COMPONENTS, but disable optional code that was enabled by default.
 
-ifeq ($(TARGET),$(filter $(TARGET),CYW943907AEVAL1F CYW954907AEVAL1F))
+ifeq ($(TARGET),$(filter $(TARGET),APP_CYW943907AEVAL1F APP_CYW954907AEVAL1F))
 DISABLE_COMPONENTS=WICED_BLE
 endif
 # By default the build system automatically looks in the Makefile's directory
@@ -92,7 +92,7 @@ SOURCES=
 # directories (without a leading -I).
 INCLUDES=
 
-ifeq ($(TARGET),$(filter $(TARGET),CYW943907AEVAL1F CYW954907AEVAL1F))
+ifeq ($(TARGET),$(filter $(TARGET),APP_CYW943907AEVAL1F APP_CYW954907AEVAL1F))
 CY_IGNORE+=../mtb_shared/btstack
 CY_IGNORE+=../mtb_shared/bluetooth-freertos
 CY_IGNORE+=../mtb_shared/capsense

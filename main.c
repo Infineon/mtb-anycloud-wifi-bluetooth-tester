@@ -1,5 +1,5 @@
 /*
- * Copyright 2022, Cypress Semiconductor Corporation (an Infineon company) or
+ * Copyright 2023, Cypress Semiconductor Corporation (an Infineon company) or
  * an affiliate of Cypress Semiconductor Corporation.  All rights reserved.
  *
  * This software, including source code, documentation and related
@@ -50,7 +50,7 @@
 #include "wifi_utility.h"
 #include "cy_wcm.h"
 
-#if !defined COMPONENT_43907
+#if !defined COMPONENT_4390X
 #include "bt_utility.h"
 #include "bt_cfg.h"
 #endif
@@ -194,7 +194,7 @@ cy_rslt_t command_console_add_command(void) {
     /* Initialize IPERF utility and add IPERF commands */
     iperf_utility_init(&wcm_config.interface);
 
-#if !defined COMPONENT_43907
+#if !defined COMPONENT_4390X
     /* Initialize Bluetooth utility and add BT commands */
     bt_utility_init();
 #endif
@@ -210,7 +210,7 @@ static void console_task(void *arg)
 {
     cy_rslt_t res;
     
-#if !defined COMPONENT_43907
+#if !defined COMPONENT_4390X
     printf(" CY_SRAM_SIZE:%ld\n", (long)CY_SRAM_SIZE);
     printf(" Heap size:%d\n", configTOTAL_HEAP_SIZE);
     printf(" SystemCoreClock:%ld\n", (long)SystemCoreClock);
@@ -218,7 +218,7 @@ static void console_task(void *arg)
 #endif
 
     /* Initialize wcm */
-    wcm_config.interface = CY_WCM_INTERFACE_TYPE_STA;
+    wcm_config.interface = CY_WCM_INTERFACE_TYPE_AP_STA;
     res = cy_wcm_init(&wcm_config);
     if(res != CY_RSLT_SUCCESS)
     {
@@ -275,7 +275,7 @@ int main(void)
 cy_rslt_t set_cpu_clock ( uint32_t freq )
 {
     cy_rslt_t ret = CY_RSLT_SUCCESS;
-#if !defined COMPONENT_43907
+#if !defined COMPONENT_4390X
     uint32_t old_freq;
     cyhal_clock_t clock_pll, clock_hf0 , clock_peri;
 
