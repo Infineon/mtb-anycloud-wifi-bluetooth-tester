@@ -7,15 +7,15 @@
 #
 ################################################################################
 # \copyright
-# Copyright 2021 Cypress Semiconductor Corporation (an Infineon company)
+# Copyright 2020-2023, Cypress Semiconductor Corporation (an Infineon company)
 # SPDX-License-Identifier: Apache-2.0
-#
+# 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-#
+# 
 #     http://www.apache.org/licenses/LICENSE-2.0
-#
+# 
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,14 +37,14 @@
 MTB_TYPE=COMBINED
 
 # Target board/hardware
-TARGET=APP_CY8CPROTO-062-4343W
+TARGET=CY8CPROTO-062-4343W
 
 # Name of application (used to derive name of final linked file).
 APPNAME=mtb-wifi-bluetooth-tester
 
 # Name of toolchain to use. Options include:
 #
-# GCC_ARM -- GCC 9.3.1, provided with ModusToolbox IDE
+# GCC_ARM -- GCC 11.3.1, provided with ModusToolbox IDE
 # ARM     -- ARM Compiler (must be installed separately)
 # IAR     -- IAR Compiler (must be installed separately)
 #
@@ -79,7 +79,10 @@ COMPONENTS=FREERTOS PSOC6HAL MBEDTLS LWIP SECURE_SOCKETS WICED_BLE WCM
 
 # Like COMPONENTS, but disable optional code that was enabled by default.
 
-ifeq ($(TARGET),$(filter $(TARGET),APP_CYW943907AEVAL1F APP_CYW954907AEVAL1F))
+ifeq ($(TARGET),$(filter $(TARGET),CYW943907AEVAL1F CYW954907AEVAL1F APP_CYW943907AEVAL1F APP_CYW954907AEVAL1F))
+ifneq ($(TOOLCHAIN), GCC_ARM)
+$(error Only GCC_ARM is supported on CYW943907AEVAL1F and CYW954907AEVAL1F at this moment)
+endif
 DISABLE_COMPONENTS=WICED_BLE
 endif
 # By default the build system automatically looks in the Makefile's directory
@@ -92,7 +95,7 @@ SOURCES=
 # directories (without a leading -I).
 INCLUDES=
 
-ifeq ($(TARGET),$(filter $(TARGET),APP_CYW943907AEVAL1F APP_CYW954907AEVAL1F))
+ifeq ($(TARGET),$(filter $(TARGET),CYW943907AEVAL1F CYW954907AEVAL1F APP_CYW943907AEVAL1F APP_CYW954907AEVAL1F))
 CY_IGNORE+=../mtb_shared/btstack
 CY_IGNORE+=../mtb_shared/bluetooth-freertos
 CY_IGNORE+=../mtb_shared/capsense
