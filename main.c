@@ -50,7 +50,7 @@
 #include "wifi_utility.h"
 #include "cy_wcm.h"
 
-#if !defined COMPONENT_4390X
+#if (defined COMPONENT_WICED_BLE)
 #include "bt_utility.h"
 #include "bt_cfg.h"
 #endif
@@ -194,7 +194,7 @@ cy_rslt_t command_console_add_command(void) {
     /* Initialize IPERF utility and add IPERF commands */
     iperf_utility_init(&wcm_config.interface);
 
-#if !defined COMPONENT_4390X
+#if (defined COMPONENT_WICED_BLE)
     /* Initialize Bluetooth utility and add BT commands */
     bt_utility_init();
 #endif
@@ -294,8 +294,13 @@ cy_rslt_t set_cpu_clock ( uint32_t freq )
     {
 #if (CYHAL_API_VERSION >= 2)
         /* Take ownership of PLL and PERI resource */
+#ifdef COMPONENT_CAT1C
+        CHECK_APP_RETURN(cyhal_clock_reserve(&clock_pll , &CYHAL_CLOCK_PLL200[0]));
+        CHECK_APP_RETURN(cyhal_clock_reserve(&clock_peri, &CYHAL_CLOCK_PERI[0]));
+#else
         CHECK_APP_RETURN(cyhal_clock_reserve(&clock_pll , &CYHAL_CLOCK_PLL[0]));
         CHECK_APP_RETURN(cyhal_clock_reserve(&clock_peri, &CYHAL_CLOCK_PERI));
+#endif
 #else
         /* Get the PLL and PERI resource */
         CHECK_APP_RETURN(cyhal_clock_get(&clock_pll,  &CYHAL_CLOCK_PLL[0]));
