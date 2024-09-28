@@ -107,6 +107,10 @@ MBEDTLSFLAGS = MBEDTLS_USER_CONFIG_FILE='"configs/mbedtls_user_config.h"'
 # Add additional defines to the build process (without a leading -D).
 DEFINES=$(MBEDTLSFLAGS) CYBSP_WIFI_CAPABLE ENABLE_UNITTESTS HAVE_SNPRINTF CY_RTOS_AWARE
 
+# Disable the data cache for KIT_XMC72_EVK_MUR_43439M2 kit
+ifeq ($(TARGET),$(filter $(TARGET),KIT_XMC72_EVK_MUR_43439M2 APP_KIT_XMC72_EVK_MUR_43439M2))
+DEFINES+=CY_DISABLE_XMC7000_DATA_CACHE
+endif
 
 # Select softfp or hardfp floating point. Default is softfp.
 VFP_SELECT=
